@@ -262,7 +262,10 @@ void removeEdge(int adjacency[][20], char* nodeList[20], char* origin, char* des
 void shortestPath(int adjacency[][20], char* nodeList[20], int distance[20], char* start, char* end, int current)
 {
   int max = 20;
+  // this list keeps track of the previous vertex for the shortest path to a node
+  char* previous[max];
   bool visited[max];
+  int numVisited = 0; // tracks if each node has been visited
   int a = -1; // index of the start node
   int b = -1; // index of the end node
   for (int i = 0; i < max - 1; i++) // locate the indices of each node
@@ -278,6 +281,60 @@ void shortestPath(int adjacency[][20], char* nodeList[20], int distance[20], cha
       visited[i] = false; // no vertices have been visited yet
     }
   distance[a] = 0; // the shortest path from a node to itself is always 0
+  previous[a] = nodeList[a]; // the start node has no previous node 
+  int cur = a; // index of the current node in the while loop
+  while (numVisited < max)
+    {
+      int minDist = INT_MAX;
+      int minIndex = -1; // keeps track of the closest neighbor
+      for (int c = 0; c < max - 1; c++)
+	{
+	  if (adjacency[cur][c] != -1 &&
+	      //cur != c &&
+	      visited[cur] == false) // if the vertex has an unvisited neighbor
+	    {
+	      // total distance = distance from start vertex to this vertex + new dist
+	      int newdist = adjacency[cur][c] + distance[cur];
+	      cout << nodeList[c] << ": " << newdist << endl;
+	      if (newdist < distance[c])
+		{
+		  // if the new distance to c is a shorter path, update the distance table
+		  distance[c] = newdist;
+		}
+	      if (distance[c] < minDist)
+		{
+		  // find the neighbor with the shortest distance
+		  minDist = distance[c];
+		  minIndex = c; // we will visit this neighbor next
+		  //previous[c] = nodeList[cur];
+		}
+	    }
+	}
+      visited[cur] = true;
+      //previous[minIndex] = nodeList[cur];
+      cur = minIndex;
+      numVisited++;
+      cout << endl;
+      cout << "current shortest distance: " << endl;
+      for (int i = 0; i < max - 1; i++)
+	{
+	  if (nodeList[i] && previous[i] && distance[i] != INT_MAX)
+	    {
+	      cout << nodeList[i] << ": " << distance[i] << "\tprevious: ";
+	      //cout << previous[i]<< endl;
+	      cout << endl;
+	    }
+	}
+    }
+  cout << endl;
+  cout << "FINALLL shortest distance" << endl;
+  for (int i = 0; i < max - 1; i++)
+    {
+      if (nodeList[i] && previous[i] && distance[i] != INT_MAX)
+	{
+	  cout << nodeList[i] << ": " << distance[i] << endl; //<< "\tprevious: " << previous[i] << endl;
+	}
+    }
   // while there are unvisited neighbors
   // if the shortest distance is the current node, go to all the neighbors and update
   // their shortest distances
@@ -288,6 +345,7 @@ void shortestPath(int adjacency[][20], char* nodeList[20], int distance[20], cha
   // add the current SHORTEST PATH DISTANCE (from a to the current node) to the new distance
   // if this NEW DISTANCE TOTAL is less than the SHORTEST DISTANCE for the new neighbor
   // update the shortest dstance
+  // add current to the list of visited neighbors
   // set the previous vertex as current
   // do this for every node, then set current to the neighbor with the smallest distance
   /*
